@@ -1,0 +1,25 @@
+# 核心深度学习框架（必装，适配Qwen2-VL的张量运算/混合精度训练）
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.23.0
+
+# 数据处理（文件读取/切分/批处理）
+pandas>=1.5.0
+scikit-learn>=1.2.0
+
+# Transformers生态（Qwen2-VL模型/处理器核心依赖）
+transformers>=4.35.0  # 需支持Qwen2VLForConditionalGeneration/Qwen2VLProcessor
+peft>=0.6.0           # LoRA配置（task_type="FEATURE_EXTRACTION"）
+accelerate>=0.20.0    # 辅助device_map="auto"加载模型
+
+# 视觉处理（图片读取/视觉信息预处理）
+Pillow>=9.4.0         # PIL.Image读取/创建图片（dataset.py核心依赖）
+qwen-vl-utils>=0.0.1  # process_vision_info视觉信息处理（dataset.py必装）
+
+# 工具类（训练监控/可视化）
+tqdm>=4.65.0          # 训练/预测进度条（main.py）
+matplotlib>=3.7.0     # 训练曲线绘制（main.py）
+
+# 隐含依赖（Qwen模型加载底层依赖，缺失会导致运行失败）
+sentencepiece>=0.1.99 # Qwen tokenizer底层依赖
+protobuf>=4.24.0      # 模型序列化/反序列化
