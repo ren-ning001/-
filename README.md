@@ -1,7 +1,6 @@
-# 多模态情感分类模型（MPS）
-## 项目概述
+# 项目概述
 本项目针对文本-图像配对数据完成情感三分类任务，支持 positive（积极）、neutral（中性）、negative（消极）三类标签预测。通过设计多模态融合模型，整合文本与图像的语义信息，完成数据预处理、训练集-验证集划分、超参数调优、模型训练及测试集预测全流程，最终输出测试集情感标签结果。
-
+## 多模态情感分类模型（MPS）
 ## 目录结构
 ```
 AI第五次作业（MPS）
@@ -97,16 +96,14 @@ pip install -r requirements（MPS）.txt
 
 #### 训练监控
 - 实时输出：每轮训练损失、训练集F1/准确率，验证集F1/准确率/精确率/召回率
-- 可视化：训练曲线（损失、F1、准确率）保存至`results/training_curves.png`
-- 模型保存：仅保存验证集F1最优的模型权重至`results/best_model.pth`
+- 可视化：训练曲线（损失、F1、准确率）
 
 ### 4. 测试集预测
 - 加载最优模型权重，批量预测测试集样本
-- 输出格式：`样本guid,预测标签`，保存至`results/test_predictions.txt`，示例：`8,positive`
 - 后处理：低置信度样本（置信度<0.6）自动修正为中性，平衡预测分布
 
 ## 核心功能与结果文件说明
-### 1. 核心实验能力（整合两次代码特性）
+### 1. 核心实验能力
 | 功能模块                | 核心特性                                                                 |
 |-------------------------|--------------------------------------------------------------------------|
 | 数据处理                | 文本清洗、文本/图像增强、类别平衡、缺失数据处理                          |
@@ -146,8 +143,7 @@ jupyter notebook
 ### 结果查看
 - 模型权重：`best_model.pth`
 - 测试集预测结果：`test_predictions.txt`
-- 训练可视化：`results/training_curves.png`
-- 错误案例分析：`results/bad_cases_*.txt`（仅CLIP模型支持）
+- 错误案例分析：`bad_cases_*.txt`（仅CLIP模型支持）
 
 ## 模型性能指标
 ### 验证集最优性能（CLIP平衡版模型）
@@ -163,27 +159,6 @@ jupyter notebook
 | 增强融合模型      | 0.6974  | 0.6967  | 中       | 平衡性能与速度         |
 | CLIP融合模型      | 0.7391  | 0.7333  | 中-慢    | 追求高准确率           |
 | CLIP平衡模型      | 0.7621  | 0.7650  | 中-慢    | 标签不平衡场景（推荐） |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # 多模态情感分类模型（服务器部分）
 ## 该服务器部分模型链接为 https://huggingface.co/Qwen/Qwen2-VL-7B-Instruct
@@ -228,6 +203,16 @@ python main.py
 - 加载`results/best_model.pth`权重，批量预测`test_without_label.txt`对应样本；
 - 预测结果保存至`results/test_predictions.txt`，格式为`样本ID,预测标签`。
 
+# 模型迭代优化性能总结表
+| 模型版本                  | 加权 F1  | 准确率   | positive F1 | neutral F1 | negative F1 | 核心优化点                     |
+|---------------------------|----------|----------|-------------|------------|-------------|--------------------------------|
+| 基础融合模型              | 0.6329   | 0.6613   | 0.76        | 0.16       | 0.51        | 基础文本 + 图像拼接融合        |
+| 增强融合模型              | 0.6974   | 0.6967   | 0.77        | 0.39       | 0.67        | 交叉注意力 + 残差连接          |
+| CLIP融合模型              | 0.7391   | 0.7333   | 0.82        | 0.36       | 0.73        | CLIP 预训练特征提取           |
+| 平衡 CLIP 模型            | 0.7732   | 0.7717   | 0.84        | 0.48       | 0.74        | 类别权重 + 置信度后处理        |
+| 自适应融合模型            | 0.7865   | 0.7833   | 0.85        | 0.52       | 0.75        | 多融合策略 + Bad Case 优化     |
+| Qwen/Qwen2-VL-2B-Instruct模型 | -        | 0.8250   | -           | -          | -           | 大模型跨模态直接推理           |
+
 ## 参考资源
 ### 参考仓库
 1. Hugging Face Transformers：https://github.com/huggingface/transformers  （文本编码器实现）
@@ -239,8 +224,3 @@ python main.py
 2. He, K., et al. (2016). Deep Residual Learning for Image Recognition. CVPR.（图像特征提取）
 3. Zadeh, A., et al. (2017). Tensor Fusion Network for Multimodal Sentiment Analysis. EMNLP.（跨模态融合策略参考）
 4. Radford, A., et al. (2021). Learning Transferable Visual Models From Natural Language Supervision. ICML.（CLIP模型架构）
-   
-## 结果说明
-- 训练过程中，验证集准确率会实时打印，最优模型权重保存至`results/best_model.pth`；
-- 测试集预测结果保存在`results/test_predictions.txt`，每行格式为`样本ID,positive/neutral/negative`；
-- 可在`main.py`中调用`evaluate`函数，输出训练/验证集的准确率、F1值等评估指标。
